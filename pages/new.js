@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { makeStyles } from '@mui/styles';
 
-import { TimerContext } from './../../store/timer';
+import { TimerContext } from './../store/timer';
 import { Container, Grid } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
@@ -24,20 +24,19 @@ function NewItem() {
     id: null,
     title: '',
     seconds: 0,
+    timerOn: false,
+    intervalTimer: null,
   });
 
   const handleInputChange = (event) => {
-    setFormData({
-      [event.target.name]: event.target.value,
-    });
+    setFormData({ ...formData, [event.target.name]: event.target.value });
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    addItem({ ...formData, id: new Date() });
+    addItem({ ...formData, id: Date.now() });
+    router.push('/');
   };
-
-  console.log(formData);
 
   return (
     <Container maxWidth="sm">
@@ -52,22 +51,16 @@ function NewItem() {
             <input
               type="text"
               onChange={handleInputChange}
-              placeholder="title"
               name="title"
               required
             />
             <input
               type="number"
               onChange={handleInputChange}
-              placeholder="seconds"
               name="seconds"
               required
             />
-            <input
-              type="submit"
-              value="submit"
-              disabled={formData.title == '' && formData.seconds == 0}
-            />
+            <input type="submit" value="submit" />
           </form>
         </Grid>
       </Grid>

@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
 const Home = () => {
   const router = useRouter();
   const classes = useStyles();
-  const { data } = useContext(TimerContext);
+  const { data, list } = useContext(TimerContext);
 
   return (
     <Container maxWidth="sm">
@@ -31,11 +31,11 @@ const Home = () => {
         marginY={4}
         alignItems="center">
         <Grid item xs={12} textAlign="end">
-          <button onClick={() => router.push('/item/new')}>add</button>
+          <button onClick={() => router.push('/new')}>add</button>
         </Grid>
-        {data.map((item) => (
+        {list.map((item, index) => (
           <Grid item xs={4} key={item.id}>
-            <TimerItem seconds={item.seconds} />
+            <TimerItem item={item} index={index} />
           </Grid>
         ))}
       </Grid>

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { makeStyles } from '@mui/styles';
 
 import { TimerContext } from '../store/timer';
-import { Container, Grid } from '@mui/material';
+import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
   box: {
@@ -11,60 +11,26 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const timerItem = ({ seconds }) => {
+const timerItem = ({ item, index }) => {
   const classes = useStyles();
-  // const { test } = useContext(TimerContext);
+  const router = useRouter();
+  const { removeItem, startTimer, stopTimer, resetTimer, test } =
+    useContext(TimerContext);
 
-  const [time, setTime] = useState(seconds);
-
-  const [timerOn, setTimerOn] = useState(false);
-
-  const [test, setTest] = useState(null);
-
-  useEffect(() => {
-    if (timerOn) {
-      setTest(
-        setInterval(() => {
-          setTime((prevTime) => prevTime - 1);
-        }, 1000)
-      );
-    } else {
-      clearInterval(test);
-    }
-
-    return () => clearInterval(test);
-  }, [timerOn]);
-
-  useEffect(() => {
-    if (time == -1) {
-      console.log('terminado');
-      setTime(seconds);
-      setTimerOn(false);
-      clearInterval(test);
-    }
-  }, [time]);
-
-  function start() {
-    setTimerOn(true);
-  }
-
-  function stop() {
-    setTimerOn(false);
-  }
-
-  function reset() {
-    setTime(seconds);
-    stop();
-  }
+  const handleClick = () => startTimer(item);
 
   return (
     <div className={classes.box}>
-      <span>✏</span>
-      <span>❌</span>
-      <div>{time}</div>
-      {!timerOn && <button onClick={start}>Start</button>}
-      {timerOn && <button onClick={stop}>Stop</button>}
-      <button onClick={reset}>Reset</button>
+      <span onClick={() => router.push(`/${item.id}/update`)}>✏</span>
+      <span onClick={() => removeItem(item.id)}>❌</span>
+      <div>{item.title}</div>
+      <div>{item.timer}</div>
+      {!item.timerOn && <button onClick={handleClick}>Start</button>}
+      {item.timerOn && <button onClick={() => stopTimer(item)}>Stop</button>}
+      <button onClick={() => resetTimer(item)} disabled={item.timerOn}>
+        Reset
+      </button>
+      <button onClick={() => test(index)}>test</button>
     </div>
   );
 };
