@@ -160,7 +160,7 @@ const Update = () => {
                       Boolean(formik.values.second))
                 )
               }>
-              Add
+              Edit
             </Button>
           </Grid>
         </Grid>
