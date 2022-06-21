@@ -1,200 +1,96 @@
-import { createContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { createContext, useEffect } from 'react';
 import useArray from 'react-use-array';
 
 const TimerContext = createContext();
 
 const TimerProvider = ({ children }) => {
-  const router = useRouter();
-
-  const [data, setData] = useState([
-    {
-      id: 0,
-      title: 'aaaa',
-      seconds: 3,
-      timer: 3,
-      timerOn: false,
-      intervalTimer: null,
-    },
-    {
-      id: 1,
-      title: 'bbbb',
-      seconds: 5,
-      timer: 5,
-      timerOn: false,
-      intervalTimer: null,
-    },
-    {
-      id: 2,
-      title: 'cccc',
-      seconds: 7,
-      timer: 7,
-      timerOn: false,
-      intervalTimer: null,
-    },
+  const [data, { push, updateAt, removeAt, map }] = useArray([
+    // {
+    //   id: 0,
+    //   title: 'timer 1',
+    //   seconds: 3,
+    //   timer: 3,
+    //   timerOn: false,
+    //   intervalTimer: null,
+    // },
+    // {
+    //   id: 1,
+    //   title: 'timer 2',
+    //   seconds: 5,
+    //   timer: 5,
+    //   timerOn: false,
+    //   intervalTimer: null,
+    // },
+    // {
+    //   id: 2,
+    //   title: 'timer 3',
+    //   seconds: 7,
+    //   timer: 7,
+    //   timerOn: false,
+    //   intervalTimer: null,
+    // },
   ]);
 
-  const getDataById = (id) => {
-    const item = data.find((x) => x.id === parseInt(id));
-    return item;
-  };
+  // -------------------------------------------------------
 
-  const addItem = (item) => {
-    const cloneData = data;
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const data = window.localStorage.getItem('DATA');
 
-    cloneData.push({
-      ...item,
-      seconds: parseInt(item.seconds),
-      timer: parseInt(item.seconds),
-    });
+      const dataJson = JSON.parse(data);
 
-    setData(cloneData);
-  };
-
-  const updateItem = (item, name) => {
-    const cloneData = data.map((obj) => {
-      if (obj.id === item.id) {
-        return { ...obj, ...item };
+      if (dataJson !== null) {
+        dataJson.forEach((item, index) => {
+          push(item);
+          stopTimer(index, item);
+        });
       }
+    }
 
-      return obj;
-    });
+    return () => {};
+  }, []);
 
-    // console.log({ cloneData, name });
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      return window.localStorage.setItem('DATA', JSON.stringify(data));
+    }
+  }, [data]);
 
-    setData(cloneData);
+  // -------------------------------------------------------
 
-    // console.log(name);
-
-    // const cloneData = JSON.parse(JSON.stringify(data));
-
-    // const index = cloneData.findIndex((obj) => {
-    //   return obj.id === item.id;
-    // });
-
-    // console.log({
-    //   a: cloneData[index],
-    //   b: item,
-    //   merge: { ...cloneData[index], ...item },
-    // });
-
-    // cloneData[index] = { ...cloneData[index], ...item };
-
-    // setData(cloneData);
+  const getDataById = (id) => {
+    return data.find((item) => item.id === parseInt(id));
   };
 
-  const removeItem = (id) => {
-    console.log('remove item', id);
+  const getIndexById = (id) => {
+    return data.findIndex((obj) => obj.id === parseInt(id));
+  };
 
-    const cloneData = data.filter((object) => {
-      return object.id !== id;
+  const addItem = (newItem) => {
+    push({
+      ...newItem,
+
+      seconds: parseInt(newItem.seconds),
+
+      timer: parseInt(newItem.seconds),
     });
+  };
 
-    setData((state) => [...cloneData]);
+  const updateItem = (index, update) => {
+    updateAt(index, (item) => ({
+      ...item,
+
+      ...update,
+    }));
+  };
+
+  const removeItem = (index) => {
+    removeAt(index);
   };
 
   // -------------------------------------------------------
 
-  const subtractTimer = (item) => {
-    const test = getDataById(item.id);
-
-    updateItem(
-      {
-        id: item.id,
-
-        timer: test.timer - 1,
-      },
-      'subtract timer'
-    );
-  };
-
-  const startTimer = (item) => {
-    const test = {
-      id: item.id,
-
-      timerOn: true,
-    };
-
-    updateItem(test, 'start timer');
-  };
-
-  useEffect(() => {
-    data.map((item) => {
-      if (item.timerOn === true && item.intervalTimer === null) {
-        // console.log('use effect item', item.id);
-
-        const intervalTimer = setInterval(() => {
-          // console.log('1s', item.id);
-          subtractTimer(item);
-        }, 1000);
-
-        updateItem(
-          {
-            id: item.id,
-
-            intervalTimer,
-          },
-
-          'use effect'
-        );
-      }
-    });
-  }, [data]);
-
-  const stopTimer = (item) => {
-    clearInterval(item.intervalTimer);
-
-    updateItem(
-      {
-        id: item.id,
-
-        timerOn: false,
-
-        intervalTimer: null,
-      },
-      'stop Timer'
-    );
-
-    console.log('stop Timer');
-  };
-
-  const resetTimer = (item) => {
-    updateItem(
-      {
-        id: item.id,
-
-        timer: item.seconds,
-
-        timerOn: false,
-
-        intervalTimer: null,
-      },
-      'reset Timer'
-    );
-
-    console.log('reset Timer');
-  };
-
-  const [
-    list,
-    {
-      set,
-      empty,
-      replace,
-      push,
-      updateAt,
-      setAt,
-      removeAt,
-      filter,
-      map,
-      sort,
-      reverse,
-      mergeBefore,
-      mergeAfter,
-    },
-  ] = useArray(data);
-
-  const test2 = (index) => {
+  const subtractTimer = (index, item) => {
     updateAt(index, (item) => ({
       ...item,
 
@@ -202,19 +98,62 @@ const TimerProvider = ({ children }) => {
     }));
   };
 
-  const test = (index) => {
+  const startTimer = (index) => {
     updateAt(index, (item) => ({
       ...item,
 
       timerOn: true,
 
       intervalTimer: setInterval(() => {
-        test2(index);
+        subtractTimer(index, item);
       }, 1000),
     }));
   };
 
-  console.log(list);
+  const stopTimer = (index, itemOriginal) => {
+    clearInterval(itemOriginal.intervalTimer);
+
+    updateItem(index, {
+      timerOn: false,
+
+      intervalTimer: null,
+    });
+  };
+
+  const resetTimer = (index) => {
+    updateAt(index, (item) => ({
+      ...item,
+
+      timer: item.seconds,
+
+      timerOn: false,
+
+      intervalTimer: null,
+    }));
+  };
+
+  useEffect(() => {
+    data.map((item, index) => {
+      if (
+        item.timerOn === true &&
+        item.intervalTimer !== null &&
+        item.timer <= 0
+      ) {
+        stopTimer(index, item);
+      }
+    });
+  }, [data]);
+
+  // -------------------------------------------------------
+
+  const timerFormat = (secs) => {
+    let sec_num = parseInt(secs, 10);
+    let hours = Math.floor(sec_num / 3600);
+    let minutes = Math.floor(sec_num / 60) % 60;
+    let seconds = sec_num % 60;
+
+    return [hours, minutes, seconds];
+  };
 
   // -------------------------------------------------------
 
@@ -229,8 +168,8 @@ const TimerProvider = ({ children }) => {
         startTimer,
         stopTimer,
         resetTimer,
-        test,
-        list,
+        getIndexById,
+        timerFormat,
       }}>
       {children}
     </TimerContext.Provider>

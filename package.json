@@ -19,6 +19,7 @@
     "@mui/styles": "^5.5.1",
     "@reduxjs/toolkit": "^1.8.0",
     "axios": "^0.26.1",
+    "formik": "^2.2.9",
     "lodash": "^4.17.21",
     "next": "^12.1.6",
     "prop-types": "^15.8.1",
@@ -27,7 +28,8 @@
     "react-dom": "^18.1.0",
     "react-redux": "^7.2.6",
     "react-use-array": "^1.0.5",
-    "sass": "^1.49.9"
+    "sass": "^1.49.9",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "eslint": "8.10.0",

@@ -1,40 +1,59 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useRouter } from 'next/router';
 import { makeStyles } from '@mui/styles';
 
 import { TimerContext } from '../store/timer';
-import { Container, Grid } from '@mui/material';
+import { Container, Fab, Grid, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 import TimerItem from './../components/timerItem';
 
 const useStyles = makeStyles((theme) => ({
-  box: {
-    border: '1px solid red',
-  },
-  gridContainer: {
-    background: '#00000022',
-    borderRadius: '15px',
+  add: {
+    position: 'absolute',
+    bottom: '0',
+    right: '0',
+    margin: '50px',
+    transform: 'scale(1.2)',
+    [theme.breakpoints.up('md')]: {
+      transform: 'scale(1)',
+    },
   },
 }));
 
 const Home = () => {
   const router = useRouter();
   const classes = useStyles();
-  const { data, list } = useContext(TimerContext);
+  const { data } = useContext(TimerContext);
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="md">
       <Grid
         container
-        className={classes.gridContainer}
         padding={2}
         marginY={4}
+        rowSpacing={2}
+        columnSpacing={4}
         alignItems="center">
         <Grid item xs={12} textAlign="end">
-          <button onClick={() => router.push('/new')}>add</button>
+          <div className={classes.add}>
+            <Fab
+              color="primary"
+              aria-label="add"
+              onClick={() => router.push('/new')}>
+              <AddIcon />
+            </Fab>
+          </div>
         </Grid>
-        {list.map((item, index) => (
-          <Grid item xs={4} key={item.id}>
+
+        {data.length == 0 && (
+          <Grid item xs={12} textAlign="center">
+            <Typography variant="h4">Add timer</Typography>
+          </Grid>
+        )}
+
+        {data.map((item, index) => (
+          <Grid item xs={12} sm={6} md={4} key={item.id}>
             <TimerItem item={item} index={index} />
           </Grid>
         ))}
