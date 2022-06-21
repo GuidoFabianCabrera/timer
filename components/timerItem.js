@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const timerItem = ({ item, index }) => {
+const TimerItem = ({ item, index }) => {
   const classes = useStyles();
   const router = useRouter();
   const { removeItem, startTimer, stopTimer, resetTimer, timerFormat } =
@@ -147,4 +147,4 @@ const timerItem = ({ item, index }) => {
   );
 };
 
-export default timerItem;
+export default TimerItem;
